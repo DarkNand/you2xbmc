@@ -11,6 +11,7 @@ No support for username and password yet.
 To install:
 
 pip install pafy
+to install pafy and
 pip install xbmc-json
 
 If you're using linux, then you also need to have the python tk package:
