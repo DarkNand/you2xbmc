@@ -1,13 +1,12 @@
 from xbmcjson import XBMC, PLAYER_VIDEO
 import pafy
-from Tkinter import Button, Entry, Tk, mainloop, CENTER, END
-from ttk import Button, Entry
+from Tkinter import Label, Button, Entry, Tk, mainloop, CENTER, END
+from ttk import Label, Button, Entry
 from os.path import *
 from threading import Thread
 
 class You2XBMC():
 	def __init__(self):
-		
 		self.address=None
 		self.video = None
 		self.ipAddress = None
@@ -15,11 +14,14 @@ class You2XBMC():
 		
 		self.window = Tk()
 		self.window.title("Send youtube video to XBMC")
+		self.window.resizable(0,0)
 		self.addressEntry = Entry()
 		self.addressEntry.config(width=50)
 		self.addressEntry.config(justify=CENTER)
+		self.addressLabel = Label(text="Insert youtube video address: ")
 		self.ipEntry = Entry()
 		self.ipEntry.config(justify=CENTER)
+		self.ipLabel = Label(text="Ip address of XBMC machine: ")
 		self.sendButton = Button(self.window, text="Play on XBMC", command=self.set_video)
 		self.sendButton.config(width=30)
 		self.clipboardButton = Button(text="Click to get from clipboard", command=self.get_clipboard)
@@ -61,10 +63,12 @@ class You2XBMC():
 		self.set_video()
 		
 	def pack_everything(self):
-		self.addressEntry.pack()
-		self.sendButton.pack()
-		self.clipboardButton.pack()
-		self.ipEntry.pack()
+		self.addressLabel.grid(row=0, column=0,pady=5, padx=20)
+		self.addressEntry.grid(row=0, column=1, pady=10)
+		self.sendButton.grid(row=3, column=1, pady=5)
+		self.clipboardButton.grid(row=0, column=2, padx=3)
+		self.ipEntry.grid(row=2, column=1, pady=10)
+		self.ipLabel.grid(row=2, column=0,pady=5, padx=20)
 
 	def mainloop(self):
 		mainloop()
