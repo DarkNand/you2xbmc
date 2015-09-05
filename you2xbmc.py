@@ -3,64 +3,73 @@ import pafy
 from Tkinter import Button, Entry, Tk, mainloop, CENTER, END
 from ttk import Button, Entry
 from os.path import *
+from threading import Thread
 
-address=None
-video = None
-ipAddress = None
-home = expanduser("~")
+class You2XBMC():
+	def __init__(self):
+		
+		self.address=None
+		self.video = None
+		self.ipAddress = None
+		self.home = expanduser("~")
+		
+		self.window = Tk()
+		self.window.title("Send youtube video to XBMC")
+		self.addressEntry = Entry()
+		self.addressEntry.config(width=50)
+		self.addressEntry.config(justify=CENTER)
+		self.ipEntry = Entry()
+		self.ipEntry.config(justify=CENTER)
+		self.sendButton = Button(self.window, text="Play on XBMC", command=self.set_video)
+		self.sendButton.config(width=30)
+		self.clipboardButton = Button(text="Click to get from clipboard", command=self.get_clipboard)
 
-if not isfile(home+"/"+"xbmcIP.txt"):
-	print "No File :("
-	ipAddress = False
+		if not isfile(self.home+"/"+"xbmcIP.txt"):
+			print "No File :("
+			self.ipAddress = False
 	
-elif isfile(home+"/"+"xbmcIP.txt"):
-	print "File Exists :)"
-	ipAddress = open(home+"/"+"xbmcIP.txt", "r").read().splitlines()[0]
-	print ipAddress
-
-window = Tk()
-window.title("Send youtube video to XBMC")
-
-def set_video():
-	global address
-	global video
-	global ipAddress
+		elif isfile(self.home+"/"+"xbmcIP.txt"):
+			print "File Exists :)"
+			self.ipAddress = open(self.home+"/"+"xbmcIP.txt", "r").read().splitlines()[0]
+			print self.ipAddress
+			
+		if self.ipAddress != False:
+			self.ipEntry.insert(0, self.ipAddress)
+			
+	def set_video(self):
+		x = Thread(target=self.set_video_callback)
+		x.start()
+		
+	def set_video_callback(self):
+		if self.ipAddress == False:
+			self.ipAddress = self.ipEntry.get()
+			xbmcIP = open(self.home+"/"+"xbmcIP.txt", "w")
+			xbmcIP.write(str(self.ipAddress))
+			xbmcIP.close()
 	
-	if ipAddress == False:
-		ipAddress = ipEntry.get()
-		xbmcIP = open(home+"/"+"xbmcIP.txt", "w")
-		xbmcIP.write(str(ipAddress))
-		xbmcIP.close()
-	
-	ipAddress = ("http://"+ipEntry.get()+"/jsonrpc")
-	xbmc = XBMC(ipAddress)
-	address = addressEntry.get()
-	video = pafy.new(address)
-	video = video.getbest()
-	print xbmc.Player.Open(item={"file": video.url})
+		self.ipAddress = ("http://"+self.ipEntry.get()+"/jsonrpc")
+		xbmc = XBMC(self.ipAddress)
+		address = self.addressEntry.get()
+		video = pafy.new(address)
+		video = video.getbest()
+		print xbmc.Player.Open(item={"file": video.url})
 
-def get_clipboard():
-	string = window.clipboard_get()
-	addressEntry.delete(0,END)
-	addressEntry.insert(0, string)
-	set_video()
-	
-addressEntry = Entry()
-addressEntry.config(width=50)
-addressEntry.config(justify=CENTER)
-ipEntry = Entry()
-ipEntry.config(justify=CENTER)
+	def get_clipboard(self):
+		string = self.window.clipboard_get()
+		self.addressEntry.delete(0,END)
+		self.addressEntry.insert(0, string)
+		self.set_video()
+		
+	def pack_everything(self):
+		self.addressEntry.pack()
+		self.sendButton.pack()
+		self.clipboardButton.pack()
+		self.ipEntry.pack()
 
-if ipAddress != False:
-	ipEntry.insert(0, ipAddress)
+	def mainloop(self):
+		mainloop()
 
-sendButton = Button(window, text="Play on XBMC", command=set_video)
-sendButton.config(width=30)
-clipboardButton = Button(text="Click to get from clipboard", command=get_clipboard)
-addressEntry.pack()
-sendButton.pack()
-clipboardButton.pack()
-ipEntry.pack()
-
-
-mainloop()
+if __name__ == "__main__":
+	you2xbmc = You2XBMC()
+	you2xbmc.pack_everything()
+	you2xbmc.mainloop()
